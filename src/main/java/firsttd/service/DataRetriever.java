@@ -3,7 +3,6 @@ package firsttd.service;
 import firsttd.config.DBConnection;
 import firsttd.model.Category;
 import firsttd.model.Product;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +11,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 public class DataRetriever {
 
@@ -40,20 +41,20 @@ public class DataRetriever {
 
   public List<Product> getProductList(int page, int size) {
     int offset = size * (page - 1) + 1;
-    String sql = """
-    SELECT p.id, p.name, p.creation_datetime, c.id as category_id, c.name as category_name
-    FROM product p join product_category c
-    ON p.id = c.product_id
-    LIMIT ? OFFSET ?;
-    """;
+    String sql =
+        """
+        SELECT p.id, p.name, p.creation_datetime, c.id as category_id, c.name as category_name
+        FROM product p join product_category c
+        ON p.id = c.product_id
+        LIMIT ? OFFSET ?;
+        """;
     List<Product> products = new ArrayList<>();
-    try(Connection conn = dbConnection.getDBConnection();
-      PreparedStatement ps = conn.prepareStatement(sql);
-    ) {
+    try (Connection conn = dbConnection.getDBConnection();
+        PreparedStatement ps = conn.prepareStatement(sql); ) {
       ps.setInt(1, size);
       ps.setInt(2, offset);
       ResultSet rs = ps.executeQuery();
-      while(rs.next()) {
+      while (rs.next()) {
         int categoryId = rs.getInt("category_id");
         String categoryName = rs.getString("category_name");
         Category category = new Category(categoryId, categoryName);
@@ -65,14 +66,97 @@ public class DataRetriever {
         products.add(product);
       }
       return products;
-    } catch(Exception e) {
+    } catch (Exception e) {
+      throw new RuntimeException("Cannot retrieve products: " + e);
+    }
+  }
+
+  public List<Product> getProductsByCriteria(
+      String productName, String categoryName, Instant creationMin, Instant creationMax) {
+    String sql =
+        """
+        SELECT p.id, p.name, p.creation_datetime, c.name as category_name, c.id as category_id
+        FROM product p JOIN product_category c
+        ON p.id = c.product_id
+        """;
+    List<Product> products = new ArrayList<>();
+    List<String> conditions = new ArrayList<>();
+    String productNameWhereStatement = null;
+    String categoryNameWhereStatement = null;
+    String creationMinWhereStatement = null;
+    String creationMaxWhereStatement = null;
+    if (productName != null && !productName.isBlank()) {
+      productNameWhereStatement =
+          """
+          p.name ILIKE ?
+          """;
+    }
+    if (categoryName != null && !categoryName.isBlank()) {
+      categoryNameWhereStatement =
+          """
+          c.name ILIKE ?
+          """;
+    }
+    if (creationMin != null) {
+      creationMinWhereStatement =
+          """
+          p.creation_datetime >= ?
+          """;
+    }
+    if (creationMax != null) {
+      creationMaxWhereStatement =
+          """
+          p.creation_datetime <= ?
+          """;
+    }
+    if (categoryNameWhereStatement == null
+        && productNameWhereStatement == null
+        && creationMinWhereStatement == null
+        && creationMaxWhereStatement == null) {
+      sql += ";";
+    } else {
+      sql += " WHERE ";
+      conditions =
+          Stream.of(
+                  productNameWhereStatement,
+                  categoryNameWhereStatement,
+                  creationMinWhereStatement,
+                  creationMaxWhereStatement)
+              .filter(Objects::nonNull)
+              .toList();
+      String whereStatements = String.join(" AND ", conditions);
+      sql += whereStatements + ";";
+    }
+    try (Connection conn = dbConnection.getDBConnection();
+        PreparedStatement ps = conn.prepareStatement(sql); ) {
+
+      for (int i = 0; i < conditions.size(); i++) {
+        if (conditions.get(i).equals(productNameWhereStatement)) {
+          ps.setString(i + 1, "%" + productName + "%");
+        } else if (conditions.get(i).equals(categoryNameWhereStatement)) {
+          ps.setString(i + 1, "%" + categoryName + "%");
+        } else if (conditions.get(i).equals(creationMinWhereStatement)) {
+          ps.setTimestamp(i + 1, Timestamp.from(creationMin));
+        } else if (conditions.get(i).equals(creationMaxWhereStatement)) {
+          ps.setTimestamp(i + 1, Timestamp.from(creationMax));
+        }
+      }
+
+      ResultSet rs = ps.executeQuery();
+      while (rs.next()) {
+        int categoryIdinDB = rs.getInt("category_id");
+        String categoryNameinDB = rs.getString("category_name");
+        Category category = new Category(categoryIdinDB, categoryNameinDB);
+        int id = rs.getInt("id");
+        String name = rs.getString("name");
+        Timestamp creationDatetimeTimestamp = rs.getTimestamp("creation_datetime");
+        Instant creationDatetime = creationDatetimeTimestamp.toInstant();
+        Product product = new Product(id, name, creationDatetime, category);
+        products.add(product);
+      }
+      return products;
+    } catch (Exception e) {
       throw new RuntimeException("Cannot retrieve products: " + e);
     }
   }
 }
-
-
-
-
-
-
