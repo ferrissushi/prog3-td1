@@ -11,6 +11,8 @@ BEGIN
 END
 $user_creation$;
 
+\c product_management_db
+
 GRANT USAGE, CREATE ON SCHEMA public TO product_manager_user;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO product_manager_user;
 GRANT SELECT, USAGE ON ALL SEQUENCES IN SCHEMA public TO product_manager_user;
