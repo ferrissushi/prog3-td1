@@ -1,13 +1,13 @@
-create table if not exists product (
-  id int primary key,
-  name varchar(255) not null,
-  price numeric not null check (price > 0),
-  creation_datetime timestamp not null default current_timestamp
+CREATE TABLE IF NOT EXISTS product (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  price NUMERIC NOT NULL CHECK (price > 0),
+  creation_datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-create table if not exists product_category (
-  id int primary key,
-  name varchar(255) not null,
-  product_id int not null,
-  constraint fk_product_category foreign key (product_id) references product (id)
+CREATE TABLE IF NOT EXISTS product_category (
+  id iNT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  product_id INT NOT NULL,
+  CONSTRAINT fk_product_category FOREIGN KEY (product_id) REFERENCES product (id)
 );
