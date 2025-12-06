@@ -1,7 +1,7 @@
 create table if not exists product (
   id int primary key,
   name varchar(255) not null,
-  price number not null,
+  price numeric not null check (price > 0),
   creation_datetime timestamp not null default current_timestamp
 );
 
