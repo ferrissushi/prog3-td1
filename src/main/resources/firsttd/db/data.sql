@@ -6,10 +6,10 @@ INSERT INTO product (name, price, creation_datetime) VALUES
 ('Ecran Samsung 27""', 1200.00, '2024-03-18 08:00:00')
 
 INSERT INTO product_category (name, product_id) VALUES
-('Informatique',1),
-('Telephonie',2),
-('Audio',3),
-('Accessoires',4),
-('Informatique',5 ),
-('Bureau',5),
-('Mobile',22),
+('Informatique', 1),
+('Telephonie', 2),
+('Audio', 3),
+('Accessoires', 4),
+('Informatique', 5 ),
+('Bureau', 5),
+('Mobile', 2);
