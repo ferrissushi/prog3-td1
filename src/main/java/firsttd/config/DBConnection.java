@@ -9,6 +9,8 @@ public class DBConnection {
   private final String USER = "product_manager_user";
   private final String PASSWORD = "123456";
 
+  public DBConnection() {}
+
   public Connection getDBConnection() throws SQLException {
     return DriverManager.getConnection(URL, USER, PASSWORD);
   }
