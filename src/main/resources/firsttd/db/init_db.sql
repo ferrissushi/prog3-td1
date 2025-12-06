@@ -12,8 +12,10 @@ END
 DO
 &user_creation&
 BEGIN
-  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'product_management_db') THEN
-    CREATE USER product_management_db;
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'product_management_user') THEN
+    CREATE USER product_management_user;
   END IF;
 END
 &user_creation&;
+
+-- GRANT USEGE, CREATE ON SCHEMA public TO ;
