@@ -1,27 +1,18 @@
--- I used PL/SQL to create the database and the user to not let people create it twice...
+SELECT 'CREATE DATABASE product_management_db;'
+WHERE NOT EXISTS
+(SELECT FROM pg_database WHERE datname = 'product_management_db')\gexec
 
 DO
-&database_creation&
+$user_creation$
 BEGIN
-  IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'product_management_db') THEN
-    CREATE DATABASE product_management_db;
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'product_manager_user') THEN
+    CREATE USER product_manager_user WITH PASSWORD '123456';
   END IF;
 END
-&database_creation&;
+$user_creation$;
 
-DO
-&user_creation&
-BEGIN
-  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'product_management_user') THEN
-    CREATE USER product_management_user;
-  END IF;
-END
-&user_creation&;
-
-GRANT USAGE, CREATE ON SCHEMA public TO product_management_user;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO product_management_user;
-GRANT SELECT, USAGE ON ALL SEQUENCES IN SCHEMA public TO product_management_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO product_management_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, USAGE ON SEQUENCES TO product_management_user;
-
-\c product_management_db
+GRANT USAGE, CREATE ON SCHEMA public TO product_manager_user;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO product_manager_user;
+GRANT SELECT, USAGE ON ALL SEQUENCES IN SCHEMA public TO product_manager_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO product_manager_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, USAGE ON SEQUENCES TO product_manager_user;
