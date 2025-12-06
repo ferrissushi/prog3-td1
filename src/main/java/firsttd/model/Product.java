@@ -8,7 +8,7 @@ public class Product {
   private Instant creationDateTime;
   private Category category;
 
-  public Product(int id, String name, double price, Instant creationDateTime,Category category) {
+  public Product(int id, String name, Instant creationDateTime,Category category) {
     this.id = id;
     this.name = name;
     this.category = category;
