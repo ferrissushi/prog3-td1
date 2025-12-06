@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS product (
 );
 
 CREATE TABLE IF NOT EXISTS product_category (
-  id iNT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   product_id INT NOT NULL,
   CONSTRAINT fk_product_category FOREIGN KEY (product_id) REFERENCES product (id)
