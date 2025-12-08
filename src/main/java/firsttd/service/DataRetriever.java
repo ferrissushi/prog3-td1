@@ -26,7 +26,7 @@ public class DataRetriever {
     List<Category> categories = new ArrayList<>();
     try (Connection conn = dbConnection.getDBConnection();
         Statement st = conn.createStatement(); ) {
-      ResultSet rs = st.executeQuery("SELECT id, name FROM category;");
+      ResultSet rs = st.executeQuery("SELECT id, name FROM product_category;");
       while (rs.next()) {
         int id = rs.getInt("id");
         String name = rs.getString("name");
@@ -218,6 +218,7 @@ public class DataRetriever {
               .filter(Objects::nonNull)
               .toList();
       String whereStatements = String.join(" AND ", conditions);
+      sql += whereStatements;
     }
     sql += " LIMIT ? OFFSET ?;";
     try (Connection conn = dbConnection.getDBConnection();
@@ -235,8 +236,8 @@ public class DataRetriever {
         }
       }
 
-      ps.setInt(i, size);
-      ps.setInt(i + 1, offset);
+      ps.setInt(i + 1, size);
+      ps.setInt(i + 2, offset);
 
       ResultSet rs = ps.executeQuery();
       while (rs.next()) {
