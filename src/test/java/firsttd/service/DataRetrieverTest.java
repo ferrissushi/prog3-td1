@@ -12,18 +12,15 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 
-@TestInstance(Lifecycle.PER_CLASS)
 public class DataRetrieverTest {
 
   private DataRetriever dataRetriever = new DataRetriever();
   private DBConnection dbConnection = new DBConnection();
 
-  @BeforeAll
+  @BeforeEach
   public void setUpTest() {
     String sql =
         """
@@ -32,7 +29,7 @@ public class DataRetrieverTest {
           (2,'Iphone 13', 5200.00, '2024-02-01 14:10:00'),
           (3,'Casque Sony WH1000', 890.50, '2024-02-10 16:45:00'),
           (4,'Clavier Logitech', 180.00, '2024-03-05 11:20:00'),
-          (5,'Ecran Samsung 27""', 1200.00, '2024-03-18 08:00:00')
+          (5,'Ecran Samsung 27""', 1200.00, '2024-03-18 08:00:00');
 
           INSERT INTO product_category (id, name, product_id) VALUES
           (1,'Informatique', 1),
@@ -43,9 +40,9 @@ public class DataRetrieverTest {
           (6,'Bureau', 5),
           (7,'Mobile', 2);
         """;
-    try (Connection conn = dbConnection.getDBConnection();
-        PreparedStatement ps = conn.prepareStatement(sql); ) {
-      ps.executeUpdate();
+    try (Connection conn = dbConnection.getDBConnection();){
+      conn.prepareStatement("DELETE * FROM products").executeUpdate();
+      conn.prepareStatement("DELETE * FROM product_category").executeUpdate();
       System.out.println("Data inserted successfully");
     } catch (Exception e) {
       System.out.println("Data already found in the database.");
@@ -242,7 +239,11 @@ public class DataRetrieverTest {
 
   @Test
   public void should_return_product_list_ko() {
-    Exception exception = assertThrows(IllegalArgumentException.class, () -> dataRetriever.getProductList(-1, 1));
+    Exception exception =
+        assertThrows(IllegalArgumentException.class, () -> dataRetriever.getProductList(-1, 1));
     assertEquals("Page and size must be positive", exception.getMessage());
   }
+
+  @Test
+  public void should_return_product_by_criteria_ok() {}
 }
