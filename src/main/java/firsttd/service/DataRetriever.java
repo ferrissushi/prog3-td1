@@ -40,7 +40,7 @@ public class DataRetriever {
   }
 
   public List<Product> getProductList(int page, int size) {
-    int offset = size * (page - 1) + 1;
+    int offset = size * (page - 1);
     String sql =
         """
         SELECT p.id, p.name, p.creation_datetime, c.id as category_id, c.name as category_name
