@@ -1,6 +1,7 @@
 package firsttd.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import firsttd.config.DBConnection;
 import firsttd.model.Category;
@@ -159,5 +160,89 @@ public class DataRetrieverTest {
                     .toInstant(),
                 new Category(4, "Accessoires")));
     assertEquals(expectedProducts, products);
+  }
+
+  @Test
+  public void should_return_empty_product_list_without_pagination_ok() {
+    List<Product> products = dataRetriever.getProductList(0, 0);
+    List<Product> expectedProducts = List.of();
+    assertEquals(expectedProducts, products);
+  }
+
+  @Test
+  public void should_return_all_product_list_with_pagination() {
+    List<Product> products = dataRetriever.getProductList(1, 7);
+    List<Product> expectedProducts =
+        List.of(
+            new Product(
+                1,
+                "Laptop Dell XPS",
+                LocalDateTime.parse(
+                        "2024-01-15 09:30:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant(),
+                new Category(1, "Informatique")),
+            new Product(
+                2,
+                "Iphone 13",
+                LocalDateTime.parse(
+                        "2024-02-01 14:10:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant(),
+                new Category(2, "Telephonie")),
+            new Product(
+                3,
+                "Casque Sony WH1000",
+                LocalDateTime.parse(
+                        "2024-02-10 16:45:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant(),
+                new Category(3, "Audio")),
+            new Product(
+                4,
+                "Clavier Logitech",
+                LocalDateTime.parse(
+                        "2024-03-05 11:20:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant(),
+                new Category(4, "Accessoires")),
+            new Product(
+                5,
+                "Ecran Samsung 27\"\"",
+                LocalDateTime.parse(
+                        "2024-03-18 08:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant(),
+                new Category(5, "Informatique")),
+            new Product(
+                5,
+                "Ecran Samsung 27\"\"",
+                LocalDateTime.parse(
+                        "2024-03-18 08:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant(),
+                new Category(6, "Bureau")),
+            new Product(
+                2,
+                "Iphone 13",
+                LocalDateTime.parse(
+                        "2024-02-01 14:10:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant(),
+                new Category(7, "Mobile")));
+    assertEquals(expectedProducts, products);
+  }
+
+  @Test
+  public void should_return_empty_list_with_pagination_out_of_bounds_ok() {
+    List<Product> products = dataRetriever.getProductList(2, 8);
+    List<Product> expectedProducts = List.of();
+    assertEquals(expectedProducts, products);
+  }
+
+  @Test
+  public void should_return_product_list_ko() {
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> dataRetriever.getProductList(-1, 1));
+    assertEquals("Page and size must be positive", exception.getMessage());
   }
 }

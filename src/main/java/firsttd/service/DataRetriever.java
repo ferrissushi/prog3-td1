@@ -40,6 +40,9 @@ public class DataRetriever {
   }
 
   public List<Product> getProductList(int page, int size) {
+    if (page < 0 || size < 0) {
+      throw new IllegalArgumentException("Page and size must be positive");
+    }
     int offset = size * (page - 1);
     String sql =
         """
