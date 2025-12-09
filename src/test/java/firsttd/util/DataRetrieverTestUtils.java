@@ -13,6 +13,9 @@ import java.util.List;
 
 public class DataRetrieverTestUtils {
   public int[] parseStringToIntArray(String string) {
+    if (string == null) {
+      return new int[0];
+    }
     return Arrays.stream(string.split(" ")).mapToInt(Integer::parseInt).toArray();
   }
 

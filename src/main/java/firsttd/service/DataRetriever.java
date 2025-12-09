@@ -104,13 +104,13 @@ public class DataRetriever {
     if (creationMin != null) {
       creationMinWhereStatement =
           """
-          p.creation_datetime >= ?
+          p.creation_datetime > ?
           """;
     }
     if (creationMax != null) {
       creationMaxWhereStatement =
           """
-          p.creation_datetime <= ?
+          p.creation_datetime < ?
           """;
     }
     if (categoryNameWhereStatement == null
@@ -171,7 +171,10 @@ public class DataRetriever {
       Instant creationMax,
       int page,
       int size) {
-    int offset = size * (page - 1) + 1;
+    if (page <= 0 || size <= 0) {
+      throw new IllegalArgumentException("Page and size must be positive");
+    }
+    int offset = size * (page - 1);
     String sql =
         """
         SELECT p.id, p.name, p.creation_datetime, c.name as category_name, c.id as category_id
@@ -199,13 +202,13 @@ public class DataRetriever {
     if (creationMin != null) {
       creationMinWhereStatement =
           """
-          p.creation_datetime >= ?
+          p.creation_datetime > ?
           """;
     }
     if (creationMax != null) {
       creationMaxWhereStatement =
           """
-          p.creation_datetime <= ?
+          p.creation_datetime < ?
           """;
     }
     if (categoryNameWhereStatement != null
@@ -224,7 +227,7 @@ public class DataRetriever {
       String whereStatements = String.join(" AND ", conditions);
       sql += whereStatements;
     }
-    sql += " LIMIT ? OFFSET ? ORDER BY p.id, c.id ASC;";
+    sql += " ORDER BY p.id, c.id ASC LIMIT ? OFFSET ?;";
     try (Connection conn = dbConnection.getDBConnection();
         PreparedStatement ps = conn.prepareStatement(sql); ) {
       int i = 0;
