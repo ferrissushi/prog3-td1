@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -22,8 +21,7 @@ public class DataRetrieverTest {
 
   private DataRetriever dataRetriever = new DataRetriever();
   private DBConnection dbConnection = new DBConnection();
-  private ListUtils<Product> productListUtils = new ListUtils<Product>();
-  private ListUtils<Category> categoryListUtils = new ListUtils<Category>();
+  private ListUtils<Product> listUtils = new ListUtils<Product>();
   private DataRetrieverTestUtils dataRetrieverTestUtils = new DataRetrieverTestUtils();
   private List<Product> dbProducts;
   private List<Category> dbCategories;
@@ -55,7 +53,7 @@ public class DataRetrieverTest {
   public void should_return_product_with_pagination_ok(int page, int size, String expectedIndexes) {
     List<Product> products = dataRetriever.getProductList(page, size);
     List<Product> expectedProducts =
-        productListUtils.listFromIndex(
+        listUtils.listFromIndex(
             dbProducts, dataRetrieverTestUtils.parseStringToIntArray(expectedIndexes));
     assertEquals(expectedProducts, products);
   }
@@ -104,7 +102,7 @@ public class DataRetrieverTest {
     List<Product> products =
         dataRetriever.getProductsByCriteria(productName, categoryName, creationMin, creationMax);
     List<Product> expectedProducts =
-        productListUtils.listFromIndex(
+        listUtils.listFromIndex(
             dbProducts, dataRetrieverTestUtils.parseStringToIntArray(expectedIndexes));
     assertEquals(expectedProducts, products);
   }
@@ -134,7 +132,7 @@ public class DataRetrieverTest {
             productName, categoryName, creationMin, creationMax, page, size);
 
     List<Product> expectedProducts =
-        productListUtils.listFromIndex(
+        listUtils.listFromIndex(
             dbProducts, dataRetrieverTestUtils.parseStringToIntArray(expectedIndexes));
 
     assertEquals(expectedProducts, products);
