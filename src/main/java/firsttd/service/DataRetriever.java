@@ -40,7 +40,7 @@ public class DataRetriever {
   }
 
   public List<Product> getProductList(int page, int size) {
-    if (page < 0 || size < 0) {
+    if (page <= 0 || size <= 0) {
       throw new IllegalArgumentException("Page and size must be positive");
     }
     int offset = size * (page - 1);
@@ -49,6 +49,7 @@ public class DataRetriever {
         SELECT p.id, p.name, p.creation_datetime, c.id as category_id, c.name as category_name
         FROM product p join product_category c
         ON p.id = c.product_id
+        ORDER BY p.id, c.id ASC
         LIMIT ? OFFSET ?;
         """;
     List<Product> products = new ArrayList<>();
@@ -116,7 +117,7 @@ public class DataRetriever {
         && productNameWhereStatement == null
         && creationMinWhereStatement == null
         && creationMaxWhereStatement == null) {
-      sql += ";";
+      sql += " ORDER BY p.id, c.id ASC;";
     } else {
       sql += " WHERE ";
       conditions =
@@ -128,7 +129,7 @@ public class DataRetriever {
               .filter(Objects::nonNull)
               .toList();
       String whereStatements = String.join(" AND ", conditions);
-      sql += whereStatements + ";";
+      sql += whereStatements + " ORDER BY p.id, c.id ASC;";
     }
     try (Connection conn = dbConnection.getDBConnection();
         PreparedStatement ps = conn.prepareStatement(sql); ) {
@@ -223,7 +224,7 @@ public class DataRetriever {
       String whereStatements = String.join(" AND ", conditions);
       sql += whereStatements;
     }
-    sql += " LIMIT ? OFFSET ?;";
+    sql += " LIMIT ? OFFSET ? ORDER BY p.id, c.id ASC;";
     try (Connection conn = dbConnection.getDBConnection();
         PreparedStatement ps = conn.prepareStatement(sql); ) {
       int i = 0;
